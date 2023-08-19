@@ -5,7 +5,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { signOut } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
-
+import "../App.css";
 export default function PostPageHome() {
   const [user] = useAuthState(auth);
   const [posts, setPosts] = useState([]);
@@ -47,24 +47,11 @@ export default function PostPageHome() {
 }
 
 function ImageSquare({ post }) {
-  const { image, id } = post;
+  const { image, id, likes } = post;
   return (
-    <Link
-      to={`post/${id}`}
-      style={{
-        width: "18rem",
-        marginLeft: "1rem",
-        marginTop: "2rem",
-      }}
-    >
-      <Image
-        src={image}
-        style={{
-          objectFit: "cover",
-          width: "18rem",
-          height: "18rem",
-        }}
-      />
+    <Link to={`post/${id}`} className="image-link">
+      <p className="like-count">{likes} Likes</p> {/* Display likes */}
+      <Image src={image} className="image-thumbnail" />
     </Link>
   );
 }

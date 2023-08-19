@@ -15,6 +15,7 @@ export default function PostPageDetails() {
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
   const [likes, setLikes] = useState(0);
+  const [voters, setVoters] = useState([]);
 
   async function deletePost(id) {
     //logic to delete image from Firebase storage
@@ -39,16 +40,28 @@ export default function PostPageDetails() {
     setCaption(post.caption);
     setImage(post.image);
     setLikes(post.likes || 0);
+    setVoters(post.voters || []);
   }
 
   async function handleLike() {
+    if (!user) {
+      console.log("User not logged in. Cannot vote");
+      return;
+    }
+
+    if (voters.includes(user.uid)) {
+      console.log("User has already voted for this post");
+      return;
+    }
     const newLikesCount = likes + 1;
 
     await updateDoc(doc(db, "posts", id), {
       likes: newLikesCount,
+      voters: [...voters, user.uid],
     });
 
     setLikes(newLikesCount);
+    setVoters([...voters, user.uid]);
   }
 
   useEffect(() => {
@@ -78,7 +91,11 @@ export default function PostPageDetails() {
               <Card.Body>
                 <Card.Text>{caption}</Card.Text>
                 <p>Likes: {likes}</p>
-                <button onClick={handleLike}>Like</button>
+                {user ? (
+                  <button onClick={handleLike}>Like</button>
+                ) : (
+                  <p>Please Log in to vote</p>
+                )}
                 <Card.Link href={`/update/${id}`}>Edit</Card.Link>
                 <Card.Link
                   onClick={() => deletePost(id)}
