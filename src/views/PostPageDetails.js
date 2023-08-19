@@ -10,7 +10,6 @@ import { getStorage, ref, deleteObject } from "firebase/storage";
 export default function PostPageDetails() {
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState("");
-
   const params = useParams();
   const id = params.id;
   const [user, loading] = useAuthState(auth);

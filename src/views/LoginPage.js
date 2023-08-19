@@ -3,12 +3,26 @@ import React, { useState } from "react";
 import { Button, Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log("Logged in with Gooogle", user);
+      navigate("/");
+    } catch (error) {
+      setError(error.message);
+      console.error("Google Sign-In Error:", error);
+    }
+  };
 
   return (
     <Container>
@@ -52,6 +66,9 @@ export default function LoginPage() {
           }}
         >
           Login
+        </Button>
+        <Button variant="primary" onClick={handleGoogleSignIn}>
+          Sign In with Google
         </Button>
       </Form>
       <p>{error}</p>
