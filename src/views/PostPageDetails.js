@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../firebase";
 import { signOut } from "firebase/auth";
-import { deleteDoc, doc, getDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { getStorage, ref, deleteObject } from "firebase/storage";
 
 export default function PostPageDetails() {
@@ -14,6 +14,7 @@ export default function PostPageDetails() {
   const id = params.id;
   const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
+  const [likes, setLikes] = useState(0);
 
   async function deletePost(id) {
     //logic to delete image from Firebase storage
@@ -37,6 +38,17 @@ export default function PostPageDetails() {
     const post = postDocument.data();
     setCaption(post.caption);
     setImage(post.image);
+    setLikes(post.likes || 0);
+  }
+
+  async function handleLike() {
+    const newLikesCount = likes + 1;
+
+    await updateDoc(doc(db, "posts", id), {
+      likes: newLikesCount,
+    });
+
+    setLikes(newLikesCount);
   }
 
   useEffect(() => {
@@ -65,6 +77,8 @@ export default function PostPageDetails() {
             <Card>
               <Card.Body>
                 <Card.Text>{caption}</Card.Text>
+                <p>Likes: {likes}</p>
+                <button onClick={handleLike}>Like</button>
                 <Card.Link href={`/update/${id}`}>Edit</Card.Link>
                 <Card.Link
                   onClick={() => deletePost(id)}
